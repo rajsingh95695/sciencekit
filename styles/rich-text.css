@@ -1,0 +1,34 @@
+.rich-text {
+  color: var(--foreground);
+  line-height: 1.8;
+}
+
+.rich-text h2,
+.rich-text h3,
+.rich-text h4 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.rich-text p,
+.rich-text ul,
+.rich-text ol {
+  margin-bottom: 1rem;
+}
+
+.rich-text ul,
+.rich-text ol {
+  padding-left: 1.25rem;
+}
+
+.rich-text li {
+  margin-bottom: 0.4rem;
+}
+
+.rich-text a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
