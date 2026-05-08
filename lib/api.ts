@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ZodError } from "zod";
 
 import { requireAdminSession, requireUserSession } from "@/lib/auth";
 import { verifyCsrf } from "@/lib/csrf";
@@ -37,6 +38,19 @@ function handleRouteError(error: unknown) {
       },
       {
         status: error.statusCode
+      }
+    );
+  }
+
+  if (error instanceof ZodError) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Validation failed.",
+        details: error.issues
+      },
+      {
+        status: 400
       }
     );
   }
