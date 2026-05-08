@@ -1,11 +1,10 @@
-.next
-node_modules
 .env
 .env.local
 .env.production
-dist
+.env.*.local
+.next
+node_modules
 coverage
+dist
 *.log
 *.tsbuildinfo
-
-.vercel
