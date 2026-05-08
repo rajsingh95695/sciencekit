@@ -1,9 +1,40 @@
-import { Queue, Worker, Job } from 'bullmq';
+import { Queue } from 'bullmq';
 import IORedis from 'ioredis';
 
-const connection = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379');
+let connection: IORedis | null = null;
+let queue: Queue | null = null;
 
-export const importQueue = new Queue('importQueue', { connection });
+function getRedisUrl() {
+  const redisUrl = process.env.REDIS_URL;
+
+  if (!redisUrl) {
+    throw new Error('REDIS_URL is required to use bulk import queue features.');
+  }
+
+  return redisUrl;
+}
+
+function getConnection() {
+  if (!connection) {
+    connection = new IORedis(getRedisUrl(), {
+      maxRetriesPerRequest: null,
+    });
+  }
+
+  return connection;
+}
+
+export function getImportQueue() {
+  if (!queue) {
+    queue = new Queue('importQueue', { connection: getConnection() });
+  }
+
+  return queue;
+}
+
+export const importQueue = {
+  add: (...args: Parameters<Queue['add']>) => getImportQueue().add(...args),
+} satisfies Pick<Queue, 'add'>;
 
 export function getRandomUserAgent() {
   const agents = [

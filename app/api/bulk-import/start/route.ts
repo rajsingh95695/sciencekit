@@ -24,13 +24,23 @@ export const POST = async (req: NextRequest) => {
     logs: [],
   });
 
-  // Add job to queue
-  await importQueue.add('bulk-import', {
-    jobId: jobDoc._id.toString(),
-    url,
-    targetCategory,
-    targetSubcategory,
-  });
+  try {
+    // Add job to queue
+    await importQueue.add('bulk-import', {
+      jobId: jobDoc._id.toString(),
+      url,
+      targetCategory,
+      targetSubcategory,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to enqueue import job';
+
+    jobDoc.status = 'failed';
+    jobDoc.logs.push(message);
+    await jobDoc.save();
+
+    return new Response(JSON.stringify({ success: false, error: message }), { status: 503 });
+  }
 
   return new Response(JSON.stringify({ success: true, jobId: jobDoc._id }), { status: 200 });
 };

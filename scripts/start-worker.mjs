@@ -8,14 +8,20 @@ import { v4 as uuidv4 } from 'uuid';
 
 // MongoDB connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/sciencekit';
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+const REDIS_URL = process.env.REDIS_URL;
+
+if (!REDIS_URL) {
+  throw new Error('REDIS_URL is required to start the bulk import worker.');
+}
 
 // Connect to MongoDB
 await mongoose.connect(MONGODB_URI);
 console.log('Connected to MongoDB');
 
 // Create Redis connection
-const connection = new IORedis(REDIS_URL);
+const connection = new IORedis(REDIS_URL, {
+  maxRetriesPerRequest: null,
+});
 
 // Import schemas (we need to define them here since we can't easily import TS files)
 const importJobSchema = new mongoose.Schema({
